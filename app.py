@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────
-# CUSTOM CSS — Dark Terminal Aesthetic
+# CUSTOM CSS — White/Light Theme
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -28,54 +28,54 @@ st.markdown("""
 
 html, body, [class*="css"] {
     font-family: 'Syne', sans-serif;
-    background-color: #0a0e1a;
-    color: #e2e8f0;
+    background-color: #f8fafc;
+    color: #1e293b;
 }
 
-.stApp { background-color: #0a0e1a; }
+.stApp { background-color: #f8fafc; }
 
 h1, h2, h3 { font-family: 'Syne', sans-serif; font-weight: 800; }
 
 .metric-card {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    border: 1px solid #1e40af33;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 18px 22px;
     margin-bottom: 12px;
-    box-shadow: 0 4px 24px rgba(59,130,246,0.08);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .buy-badge {
-    background: linear-gradient(90deg, #064e3b, #065f46);
-    color: #6ee7b7;
+    background: linear-gradient(90deg, #dcfce7, #bbf7d0);
+    color: #166534;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 12px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    border: 1px solid #6ee7b744;
+    border: 1px solid #86efac;
 }
 
 .sell-badge {
-    background: linear-gradient(90deg, #7f1d1d, #991b1b);
-    color: #fca5a5;
+    background: linear-gradient(90deg, #fee2e2, #fecaca);
+    color: #991b1b;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 12px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    border: 1px solid #fca5a544;
+    border: 1px solid #fca5a5;
 }
 
 .neutral-badge {
-    background: linear-gradient(90deg, #1c1917, #292524);
-    color: #fcd34d;
+    background: linear-gradient(90deg, #fef3c7, #fde68a);
+    color: #854d0e;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 12px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    border: 1px solid #fcd34d44;
+    border: 1px solid #fcd34d;
 }
 
 .section-header {
@@ -90,18 +90,55 @@ h1, h2, h3 { font-family: 'Syne', sans-serif; font-weight: 800; }
 .stDataFrame { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
 
 div[data-testid="metric-container"] {
-    background: #0f172a;
-    border: 1px solid #1e293b;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 10px;
     padding: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-.stSelectbox > div > div { background: #0f172a; border-color: #1e293b; }
+.stSelectbox > div > div { background: #ffffff; border-color: #e2e8f0; }
 .stTabs [data-baseweb="tab"] { font-family: 'Syne', sans-serif; font-size: 14px; }
-.stTabs [data-baseweb="tab-list"] { background: #0f172a; }
+.stTabs [data-baseweb="tab-list"] { background: #f1f5f9; }
 .stTabs [aria-selected="true"] { color: #3b82f6 !important; border-color: #3b82f6 !important; }
 
-hr { border-color: #1e293b; }
+hr { border-color: #e2e8f0; }
+
+/* Sidebar styling */
+[data-testid="stSidebar"] {
+    background-color: #ffffff;
+    border-right: 1px solid #e2e8f0;
+}
+
+[data-testid="stSidebar"] .css-1d391kg {
+    background-color: #ffffff;
+}
+
+/* DataFrame styling */
+.stDataFrame {
+    background-color: #ffffff;
+}
+
+/* Input fields */
+.stTextInput > div > div > input {
+    background-color: #ffffff;
+    color: #1e293b;
+}
+
+/* Selectbox */
+.stSelectbox label {
+    color: #1e293b !important;
+}
+
+/* Radio buttons */
+.stRadio label {
+    color: #1e293b !important;
+}
+
+/* Caption text */
+.caption {
+    color: #64748b;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -310,7 +347,7 @@ with st.sidebar:
 st.markdown("""
 <div style='margin-bottom: 8px;'>
   <div class='section-header'>NIFTY 200 ANALYSIS ENGINE</div>
-  <h1 style='font-size: 2.2rem; margin: 0; background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+  <h1 style='font-size: 2.2rem; margin: 0; background: linear-gradient(90deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
     📊 Smart Stock Dashboard
   </h1>
   <p style='color: #64748b; font-family: JetBrains Mono, monospace; font-size: 13px; margin-top: 6px;'>
@@ -383,10 +420,9 @@ with tab1:
         # Color styling
         def color_up(val):
             if isinstance(val, float) and val > 0:
-                intensity = min(int(val * 5), 100)
-                return f"background-color: rgba(16,185,129,{intensity/400}); color: #6ee7b7"
+                return "background-color: #dcfce7; color: #166534"
             elif isinstance(val, float) and val < 0:
-                return "color: #f87171"
+                return "color: #dc2626"
             return ""
 
         display_up = top_up[["Stock", "Price (₹)", "Up Streak (mo)", "1M Ret%", "3M Ret%", "6M Ret%", "1Y Ret%"]].reset_index(drop=True)
@@ -404,10 +440,9 @@ with tab1:
 
         def color_down(val):
             if isinstance(val, float) and val < 0:
-                intensity = min(int(abs(val) * 5), 100)
-                return f"background-color: rgba(239,68,68,{intensity/400}); color: #fca5a5"
+                return "background-color: #fee2e2; color: #991b1b"
             elif isinstance(val, float) and val > 0:
-                return "color: #6ee7b7"
+                return "color: #16a34a"
             return ""
 
         display_down = top_down[["Stock", "Price (₹)", "Down Streak (mo)", "1M Ret%", "3M Ret%", "6M Ret%", "1Y Ret%"]].reset_index(drop=True)
@@ -422,7 +457,7 @@ with tab1:
     top20_1y = momentum_df.dropna(subset=["1Y Ret%"]).sort_values("1Y Ret%", ascending=False).head(20)
     fig_bar = go.Figure()
     periods = ["1M Ret%","3M Ret%","6M Ret%","1Y Ret%"]
-    colors = ["#60a5fa","#34d399","#f59e0b","#a78bfa"]
+    colors = ["#3b82f6","#10b981","#f59e0b","#8b5cf6"]
     for p, c in zip(periods, colors):
         fig_bar.add_trace(go.Bar(
             name=p.replace(" Ret%",""),
@@ -433,13 +468,13 @@ with tab1:
         ))
     fig_bar.update_layout(
         barmode="group",
-        plot_bgcolor="#0a0e1a",
-        paper_bgcolor="#0a0e1a",
-        font_color="#e2e8f0",
-        legend_bgcolor="#0f172a",
+        plot_bgcolor="#ffffff",
+        paper_bgcolor="#ffffff",
+        font_color="#1e293b",
+        legend_bgcolor="#f8fafc",
         height=420,
-        xaxis=dict(gridcolor="#1e293b"),
-        yaxis=dict(gridcolor="#1e293b", title="Return %"),
+        xaxis=dict(gridcolor="#e2e8f0"),
+        yaxis=dict(gridcolor="#e2e8f0", title="Return %"),
     )
     st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -463,14 +498,14 @@ with tab2:
     filtered = filtered.sort_values(sort_by, ascending=(filter_sig == "SELL"))
 
     def signal_color(val):
-        if val == "BUY": return "background-color: rgba(16,185,129,0.15); color: #6ee7b7; font-weight:bold"
-        elif val == "SELL": return "background-color: rgba(239,68,68,0.15); color: #fca5a5; font-weight:bold"
-        else: return "background-color: rgba(252,211,77,0.10); color: #fcd34d; font-weight:bold"
+        if val == "BUY": return "background-color: #dcfce7; color: #166534; font-weight:bold"
+        elif val == "SELL": return "background-color: #fee2e2; color: #991b1b; font-weight:bold"
+        else: return "background-color: #fef3c7; color: #854d0e; font-weight:bold"
 
     def rsi_color(val):
         if isinstance(val, float):
-            if val < 35: return "color: #6ee7b7"
-            elif val > 70: return "color: #f87171"
+            if val < 35: return "color: #16a34a"
+            elif val > 70: return "color: #dc2626"
         return ""
 
     display_cols = ["Stock","Price (₹)","RSI","MA50","MA200","MACD Signal","Vol Ratio","Score","Signal"]
@@ -487,13 +522,13 @@ with tab2:
         color_discrete_sequence=["#3b82f6"],
         title="RSI Distribution Across All Stocks"
     )
-    fig_rsi.add_vline(x=30, line_dash="dash", line_color="#6ee7b7", annotation_text="Oversold (30)", annotation_font_color="#6ee7b7")
-    fig_rsi.add_vline(x=70, line_dash="dash", line_color="#f87171", annotation_text="Overbought (70)", annotation_font_color="#f87171")
+    fig_rsi.add_vline(x=30, line_dash="dash", line_color="#10b981", annotation_text="Oversold (30)", annotation_font_color="#10b981")
+    fig_rsi.add_vline(x=70, line_dash="dash", line_color="#ef4444", annotation_text="Overbought (70)", annotation_font_color="#ef4444")
     fig_rsi.update_layout(
-        plot_bgcolor="#0a0e1a", paper_bgcolor="#0a0e1a",
-        font_color="#e2e8f0", height=320,
-        xaxis=dict(gridcolor="#1e293b"),
-        yaxis=dict(gridcolor="#1e293b")
+        plot_bgcolor="#ffffff", paper_bgcolor="#ffffff",
+        font_color="#1e293b", height=320,
+        xaxis=dict(gridcolor="#e2e8f0"),
+        yaxis=dict(gridcolor="#e2e8f0")
     )
     st.plotly_chart(fig_rsi, use_container_width=True)
 
@@ -505,14 +540,14 @@ with tab2:
         color="Signal",
         size="Vol Ratio",
         hover_data=["Stock","Price (₹)","1M Ret%"],
-        color_discrete_map={"BUY":"#34d399","HOLD":"#fcd34d","SELL":"#f87171"},
+        color_discrete_map={"BUY":"#10b981","HOLD":"#f59e0b","SELL":"#ef4444"},
         title="Score vs RSI (bubble size = Volume Ratio)"
     )
     fig_bubble.update_layout(
-        plot_bgcolor="#0a0e1a", paper_bgcolor="#0a0e1a",
-        font_color="#e2e8f0", height=380,
-        xaxis=dict(gridcolor="#1e293b"),
-        yaxis=dict(gridcolor="#1e293b")
+        plot_bgcolor="#ffffff", paper_bgcolor="#ffffff",
+        font_color="#1e293b", height=380,
+        xaxis=dict(gridcolor="#e2e8f0"),
+        yaxis=dict(gridcolor="#e2e8f0")
     )
     st.plotly_chart(fig_bubble, use_container_width=True)
 
@@ -543,24 +578,24 @@ with tab3:
             x=hmap_year.columns.tolist(),
             y=hmap_year.index.tolist(),
             colorscale=[
-                [0.0, "#7f1d1d"],
-                [0.35, "#b91c1c"],
-                [0.5, "#1e293b"],
-                [0.65, "#065f46"],
-                [1.0, "#064e3b"]
+                [0.0, "#dc2626"],
+                [0.35, "#ef4444"],
+                [0.5, "#f8fafc"],
+                [0.65, "#10b981"],
+                [1.0, "#059669"]
             ],
             zmid=0,
             text=hmap_year.round(1).values,
             texttemplate="%{text}%",
-            textfont={"size": 10, "family": "JetBrains Mono"},
+            textfont={"size": 10, "family": "JetBrains Mono", "color": "#1e293b"},
             colorbar=dict(
-                tickfont=dict(color="#e2e8f0"),
-                title=dict(text="Ret%", font=dict(color="#e2e8f0"))
+                tickfont=dict(color="#1e293b"),
+                title=dict(text="Ret%", font=dict(color="#1e293b"))
             )
         ))
         fig_heat.update_layout(
-            plot_bgcolor="#0a0e1a", paper_bgcolor="#0a0e1a",
-            font_color="#e2e8f0",
+            plot_bgcolor="#ffffff", paper_bgcolor="#ffffff",
+            font_color="#1e293b",
             height=max(400, len(hmap_year) * 22),
             xaxis=dict(side="top"),
             margin=dict(l=120)
@@ -590,10 +625,10 @@ with tab3:
             color_discrete_sequence=px.colors.qualitative.Bold
         )
         fig_yoy.update_layout(
-            plot_bgcolor="#0a0e1a", paper_bgcolor="#0a0e1a",
-            font_color="#e2e8f0", height=420,
-            xaxis=dict(gridcolor="#1e293b"),
-            yaxis=dict(gridcolor="#1e293b")
+            plot_bgcolor="#ffffff", paper_bgcolor="#ffffff",
+            font_color="#1e293b", height=420,
+            xaxis=dict(gridcolor="#e2e8f0"),
+            yaxis=dict(gridcolor="#e2e8f0")
         )
         st.plotly_chart(fig_yoy, use_container_width=True)
 
@@ -642,7 +677,7 @@ with tab4:
         m3.metric("3M Return", f"{ret_3m:.2f}%")
         m4.metric("RSI (14)", f"{cur_rsi:.1f}")
         m5.metric("Signal Score", score_val)
-        m6.metric("Signal", signal_label)
+        m6.markdown(f'<div class="{badge}" style="text-align: center; margin-top: 25px;">{signal_label}</div>', unsafe_allow_html=True)
 
         st.markdown("---")
 
@@ -654,31 +689,35 @@ with tab4:
             subplot_titles=["Price + MAs + Bollinger Bands", "Volume", "RSI (14)", "MACD"]
         )
 
-        # Candlestick
+        # Candlestick (removed invalid fillcolor parameters)
         fig.add_trace(go.Candlestick(
-            x=stock_data.index, open=open_, high=high, low=low, close=close,
+            x=stock_data.index, 
+            open=open_, 
+            high=high, 
+            low=low, 
+            close=close,
             name="OHLC",
-            increasing_line_color="#34d399", decreasing_line_color="#f87171",
-            increasing_fillcolor="#34d39944", decreasing_fillcolor="#f8717144"
+            increasing_line_color="#10b981", 
+            decreasing_line_color="#ef4444"
         ), row=1, col=1)
 
         # Bollinger Bands
         fig.add_trace(go.Scatter(x=stock_data.index, y=upper_bb, name="BB Upper",
-            line=dict(color="#a78bfa", width=1, dash="dot"), opacity=0.7), row=1, col=1)
+            line=dict(color="#8b5cf6", width=1, dash="dot"), opacity=0.7), row=1, col=1)
         fig.add_trace(go.Scatter(x=stock_data.index, y=lower_bb, name="BB Lower",
-            line=dict(color="#a78bfa", width=1, dash="dot"),
-            fill="tonexty", fillcolor="rgba(167,139,250,0.05)", opacity=0.7), row=1, col=1)
+            line=dict(color="#8b5cf6", width=1, dash="dot"),
+            fill="tonexty", fillcolor="rgba(139,92,246,0.05)", opacity=0.7), row=1, col=1)
 
         # Moving Averages
         fig.add_trace(go.Scatter(x=stock_data.index, y=ma20, name="MA20",
-            line=dict(color="#fbbf24", width=1.5)), row=1, col=1)
+            line=dict(color="#f59e0b", width=1.5)), row=1, col=1)
         fig.add_trace(go.Scatter(x=stock_data.index, y=ma50, name="MA50",
-            line=dict(color="#60a5fa", width=1.5)), row=1, col=1)
+            line=dict(color="#3b82f6", width=1.5)), row=1, col=1)
         fig.add_trace(go.Scatter(x=stock_data.index, y=ma200, name="MA200",
-            line=dict(color="#f472b6", width=1.5, dash="dash")), row=1, col=1)
+            line=dict(color="#ec4899", width=1.5, dash="dash")), row=1, col=1)
 
         # Volume
-        vol_colors = ["#34d39966" if c >= o else "#f8717166"
+        vol_colors = ["#10b98166" if c >= o else "#ef444466"
                       for c, o in zip(close, open_)]
         fig.add_trace(go.Bar(x=stock_data.index, y=vol, name="Volume",
             marker_color=vol_colors), row=2, col=1)
@@ -686,29 +725,29 @@ with tab4:
         # RSI
         fig.add_trace(go.Scatter(x=stock_data.index, y=rsi_series, name="RSI",
             line=dict(color="#f59e0b", width=2)), row=3, col=1)
-        fig.add_hline(y=70, line_dash="dash", line_color="#f87171", row=3, col=1)
-        fig.add_hline(y=30, line_dash="dash", line_color="#34d399", row=3, col=1)
+        fig.add_hline(y=70, line_dash="dash", line_color="#ef4444", row=3, col=1)
+        fig.add_hline(y=30, line_dash="dash", line_color="#10b981", row=3, col=1)
 
         # MACD
         fig.add_trace(go.Scatter(x=stock_data.index, y=macd_line, name="MACD",
-            line=dict(color="#60a5fa", width=1.5)), row=4, col=1)
+            line=dict(color="#3b82f6", width=1.5)), row=4, col=1)
         fig.add_trace(go.Scatter(x=stock_data.index, y=signal_line, name="Signal",
-            line=dict(color="#f472b6", width=1.5)), row=4, col=1)
-        hist_colors = ["#34d39988" if h >= 0 else "#f8717188" for h in histogram]
+            line=dict(color="#ec4899", width=1.5)), row=4, col=1)
+        hist_colors = ["#10b98188" if h >= 0 else "#ef444488" for h in histogram]
         fig.add_trace(go.Bar(x=stock_data.index, y=histogram, name="Histogram",
             marker_color=hist_colors), row=4, col=1)
 
         fig.update_layout(
-            plot_bgcolor="#0a0e1a",
-            paper_bgcolor="#0a0e1a",
-            font=dict(color="#e2e8f0", family="JetBrains Mono"),
+            plot_bgcolor="#ffffff",
+            paper_bgcolor="#ffffff",
+            font=dict(color="#1e293b", family="JetBrains Mono"),
             height=900,
             xaxis_rangeslider_visible=False,
-            legend=dict(bgcolor="#0f172a", bordercolor="#1e293b"),
+            legend=dict(bgcolor="#f8fafc", bordercolor="#e2e8f0"),
         )
         for i in range(1, 5):
-            fig.update_xaxes(gridcolor="#1e293b", row=i, col=1)
-            fig.update_yaxes(gridcolor="#1e293b", row=i, col=1)
+            fig.update_xaxes(gridcolor="#e2e8f0", row=i, col=1)
+            fig.update_yaxes(gridcolor="#e2e8f0", row=i, col=1)
 
         st.plotly_chart(fig, use_container_width=True)
 
@@ -735,17 +774,17 @@ with tab5:
     full.index += 1
 
     def full_color(val):
-        if val == "BUY": return "background-color: rgba(16,185,129,0.2); color: #6ee7b7; font-weight:bold"
-        elif val == "SELL": return "background-color: rgba(239,68,68,0.2); color: #fca5a5; font-weight:bold"
-        elif val == "HOLD": return "background-color: rgba(252,211,77,0.1); color: #fcd34d; font-weight:bold"
+        if val == "BUY": return "background-color: #dcfce7; color: #166534; font-weight:bold"
+        elif val == "SELL": return "background-color: #fee2e2; color: #991b1b; font-weight:bold"
+        elif val == "HOLD": return "background-color: #fef3c7; color: #854d0e; font-weight:bold"
         return ""
 
     def ret_color(val):
         if isinstance(val, float):
-            if val > 5: return "color: #34d399"
-            elif val > 0: return "color: #86efac"
-            elif val < -5: return "color: #f87171"
-            elif val < 0: return "color: #fca5a5"
+            if val > 5: return "color: #059669"
+            elif val > 0: return "color: #10b981"
+            elif val < -5: return "color: #dc2626"
+            elif val < 0: return "color: #ef4444"
         return ""
 
     styled_full = full.style\
@@ -757,7 +796,7 @@ with tab5:
     st.markdown("---")
     st.markdown("### 📊 1Y Return — Full Market Snapshot")
     full_sorted = full.dropna(subset=["1Y Ret%"]).sort_values("1Y Ret%", ascending=True)
-    bar_colors = ["#34d399" if v > 0 else "#f87171" for v in full_sorted["1Y Ret%"]]
+    bar_colors = ["#10b981" if v > 0 else "#ef4444" for v in full_sorted["1Y Ret%"]]
     fig_all = go.Figure(go.Bar(
         x=full_sorted["1Y Ret%"],
         y=full_sorted["Stock"],
@@ -765,13 +804,13 @@ with tab5:
         marker_color=bar_colors,
         text=full_sorted["1Y Ret%"].round(1).astype(str) + "%",
         textposition="outside",
-        textfont=dict(size=10, family="JetBrains Mono")
+        textfont=dict(size=10, family="JetBrains Mono", color="#1e293b")
     ))
     fig_all.update_layout(
-        plot_bgcolor="#0a0e1a", paper_bgcolor="#0a0e1a",
-        font_color="#e2e8f0", height=max(500, len(full_sorted)*18),
-        xaxis=dict(gridcolor="#1e293b", title="1Y Return %"),
-        yaxis=dict(gridcolor="#1e293b", tickfont=dict(size=10)),
+        plot_bgcolor="#ffffff", paper_bgcolor="#ffffff",
+        font_color="#1e293b", height=max(500, len(full_sorted)*18),
+        xaxis=dict(gridcolor="#e2e8f0", title="1Y Return %"),
+        yaxis=dict(gridcolor="#e2e8f0", tickfont=dict(size=10)),
         margin=dict(l=120, r=80)
     )
     st.plotly_chart(fig_all, use_container_width=True)
@@ -780,7 +819,7 @@ with tab5:
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align:center; color:#334155; font-family: JetBrains Mono, monospace; font-size:11px; padding: 8px 0;'>
+<div style='text-align:center; color:#94a3b8; font-family: JetBrains Mono, monospace; font-size:11px; padding: 8px 0;'>
   Smart Stock Dashboard · Data: yFinance · Not financial advice · For educational use only
 </div>
 """, unsafe_allow_html=True)
