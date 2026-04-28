@@ -391,7 +391,7 @@ with tab1:
 
         display_up = top_up[["Stock", "Price (₹)", "Up Streak (mo)", "1M Ret%", "3M Ret%", "6M Ret%", "1Y Ret%"]].reset_index(drop=True)
         st.dataframe(
-            display_up.style.applymap(color_up, subset=["1M Ret%","3M Ret%","6M Ret%","1Y Ret%"]),
+            display_up.style.map(color_up, subset=["1M Ret%","3M Ret%","6M Ret%","1Y Ret%"]),
             use_container_width=True,
             height=550
         )
@@ -412,7 +412,7 @@ with tab1:
 
         display_down = top_down[["Stock", "Price (₹)", "Down Streak (mo)", "1M Ret%", "3M Ret%", "6M Ret%", "1Y Ret%"]].reset_index(drop=True)
         st.dataframe(
-            display_down.style.applymap(color_down, subset=["1M Ret%","3M Ret%","6M Ret%","1Y Ret%"]),
+            display_down.style.map(color_down, subset=["1M Ret%","3M Ret%","6M Ret%","1Y Ret%"]),
             use_container_width=True,
             height=550
         )
@@ -475,8 +475,8 @@ with tab2:
 
     display_cols = ["Stock","Price (₹)","RSI","MA50","MA200","MACD Signal","Vol Ratio","Score","Signal"]
     styled = filtered[display_cols].reset_index(drop=True).style\
-        .applymap(signal_color, subset=["Signal"])\
-        .applymap(rsi_color, subset=["RSI"])
+        .map(signal_color, subset=["Signal"])\
+        .map(rsi_color, subset=["RSI"])
 
     st.dataframe(styled, use_container_width=True, height=500)
 
@@ -749,8 +749,8 @@ with tab5:
         return ""
 
     styled_full = full.style\
-        .applymap(full_color, subset=["Signal"])\
-        .applymap(ret_color, subset=["1M Ret%","3M Ret%","6M Ret%","1Y Ret%"])
+        .map(full_color, subset=["Signal"])\
+        .map(ret_color, subset=["1M Ret%","3M Ret%","6M Ret%","1Y Ret%"])
 
     st.dataframe(styled_full, use_container_width=True, height=650)
 
