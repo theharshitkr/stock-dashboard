@@ -12,19 +12,110 @@ warnings.filterwarnings("ignore")
 # ─────────────────────────────────────────────
 st.set_page_config(page_title="NSE Full Market Analyzer", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
+# ─────────────────────────────────────────────
+# CUSTOM CSS - LIGHT THEME (Premium Look)
+# ─────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #e2e8f0; }
-.stApp { background-color: #0f172a; }
-h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #f1f5f9; }
-.badge-buy { background: #052e16; color: #4ade80; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #166534; display: inline-block; }
-.badge-sell { background: #2d0a0a; color: #f87171; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #991b1b; display: inline-block; }
-.badge-hold { background: #1c1408; color: #fbbf24; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #92400e; display: inline-block; }
-.label-sm { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
-.tip-box { background: #0f2444; border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 13px; color: #93c5fd; margin: 8px 0 16px 0; }
-div[data-testid="metric-container"] { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px 16px; }
-[data-testid="stSidebar"] { background-color: #0b1120 !important; border-right: 1px solid #1e293b; }
+
+html, body, [class*="css"] {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #f8fafc;
+    color: #1e2937;
+}
+.stApp { background-color: #f8fafc; }
+
+h1, h2, h3 { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    font-weight: 800; 
+    color: #0f172a; 
+}
+
+/* Cards */
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 18px 22px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+}
+
+/* Signal badges */
+.badge-buy {
+    background: #ecfdf5;
+    color: #10b981;
+    padding: 5px 16px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    border: 1px solid #10b981;
+}
+.badge-sell {
+    background: #fef2f2;
+    color: #ef4444;
+    padding: 5px 16px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    border: 1px solid #ef4444;
+}
+.badge-hold {
+    background: #fffbeb;
+    color: #d97706;
+    padding: 5px 16px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    border: 1px solid #d97706;
+}
+
+.label-sm {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.tip-box {
+    background: #f0f9ff;
+    border-left: 4px solid #0ea5e9;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #0369a1;
+}
+
+/* Streamlit overrides */
+div[data-testid="metric-container"] {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.04);
+}
+
+[data-testid="stSidebar"] {
+    background-color: #f1f5f9 !important;
+    border-right: 1px solid #e2e8f0;
+}
+
+.stSelectbox > div > div, .stTextInput > div > div > input {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #1e2937 !important;
+}
+
+.stTabs [data-baseweb="tab-list"] {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 6px;
+}
+
+.stDataFrame { background: #ffffff; }
 </style>
 """, unsafe_allow_html=True)
 # ─────────────────────────────────────────────
