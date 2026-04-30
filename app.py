@@ -339,17 +339,28 @@ with tab4:
         fig_rsi.update_layout(paper_bgcolor="#f8fafc", plot_bgcolor="#f8fafc", font=dict(color="#1e2937"), height=380, xaxis=dict(gridcolor="#e2e8f0"), yaxis=dict(gridcolor="#e2e8f0"))
         st.plotly_chart(fig_rsi, use_container_width=True)
         
-        # Chart 3: MACD + OBV
-        st.markdown("#### 📉 MACD + OBV (Volume Confirmation)")
-        fig_macd = make_subplots(rows=2, cols=1, shared_xaxes=True)
-        hist_colors = ["#10b98180" if h >= 0 else "#ef444480" for h in histogram.fillna(0)]
-        fig_macd.add_trace(go.Bar(x=idx, y=list(histogram.fillna(0)), name="Histogram", marker=dict(color=hist_colors)), row=1, col=1)
-        fig_macd.add_trace(go.Scatter(x=idx, y=macd_line, name="MACD", line=dict(color="#3b82f6", width=2)), row=1, col=1)
-        fig_macd.add_trace(go.Scatter(x=idx, y=sig_line, name="Signal", line=dict(color="#ec4899", width=2)), row=1, col=1)
-        fig_macd.add_trace(go.Scatter(x=idx, y=obv, name="OBV", line=dict(color="#8b5cf6", width=1.5)), row=2, col=1)
-        fig_macd.update_layout(paper_bgcolor="#f8fafc", plot_bgcolor="#f8fafc", font=dict(color="#1e2937"), height=380, xaxis=dict(gridcolor="#e2e8f0"), yaxis=dict(gridcolor="#e2e8f0"))
-        st.plotly_chart(fig_macd, use_container_width=True)
-        
+# Chart 3: MACD (FIXED - Simple & Working)
+st.markdown("#### 📉 MACD + OBV (Volume Confirmation)")
+fig_macd = make_subplots(rows=2, cols=1, shared_xaxes=True)
+histogram_filled = histogram.fillna(0)
+fig_macd.add_trace(go.Bar(
+    x=idx, 
+    y=list(histogram_filled), 
+    name="Histogram", 
+    marker_color="#636EFA"   # Simple single color - works perfectly
+), row=1, col=1)
+fig_macd.add_trace(go.Scatter(x=idx, y=macd_line, name="MACD", line=dict(color="#3b82f6", width=2)), row=1, col=1)
+fig_macd.add_trace(go.Scatter(x=idx, y=sig_line, name="Signal", line=dict(color="#ec4899", width=2)), row=1, col=1)
+fig_macd.add_trace(go.Scatter(x=idx, y=obv, name="OBV", line=dict(color="#8b5cf6", width=1.5)), row=2, col=1)
+fig_macd.update_layout(
+    paper_bgcolor="#f8fafc", 
+    plot_bgcolor="#f8fafc", 
+    font=dict(color="#1e2937"),
+    height=380, 
+    xaxis=dict(gridcolor="#e2e8f0"), 
+    yaxis=dict(gridcolor="#e2e8f0")
+)
+st.plotly_chart(fig_macd, use_container_width=True)
         # Chart 4: Volume + ATR
         st.markdown("#### 📦 Volume + ATR (Volatility)")
         vol_20ma = vol.rolling(20).mean()
