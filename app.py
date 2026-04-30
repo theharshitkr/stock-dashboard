@@ -9,9 +9,6 @@ from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings("ignore")
 
-# ─────────────────────────────────────────────
-# PAGE CONFIG + LIGHT THEME
-# ─────────────────────────────────────────────
 st.set_page_config(page_title="NSE Pro Analyzer • Expert Edition", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
@@ -35,9 +32,6 @@ div[data-testid="metric-container"] { background: #ffffff; border: 1px solid #e2
 </style>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
-# 250+ MAJOR NSE STOCKS
-# ─────────────────────────────────────────────
 @st.cache_data(ttl=86400)
 def get_all_nse_stocks():
     stocks = {
@@ -70,9 +64,6 @@ def get_all_nse_stocks():
 STOCKS, NAME_LIST = get_all_nse_stocks()
 TICKER_LIST = list(STOCKS.values())[:250]
 
-# ─────────────────────────────────────────────
-# ADVANCED EXPERT FUNCTIONS
-# ─────────────────────────────────────────────
 @st.cache_data(ttl=3600)
 def fetch_bulk_data(period="1y"):
     return yf.download(TICKER_LIST, period=period, interval="1d", group_by="ticker", auto_adjust=True, progress=False)
@@ -179,9 +170,6 @@ def build_signals_df(bulk):
             continue
     return pd.DataFrame(records)
 
-# ─────────────────────────────────────────────
-# SIDEBAR + HEADER
-# ─────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## 📈 NSE Pro Analyzer")
     st.markdown("**Expert Edition** • ADX • Stochastic • OBV • ATR")
@@ -200,9 +188,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
-# LOAD DATA
-# ─────────────────────────────────────────────
 with st.spinner("⏳ Loading 250+ stocks with advanced indicators..."):
     bulk = fetch_bulk_data("1y")
     signals_df = build_signals_df(bulk)
@@ -211,7 +196,6 @@ if signals_df.empty:
     st.error("Data load failed. Refresh karo.")
     st.stop()
 
-# Top KPIs
 top_gainers = signals_df.nlargest(10, "30D Return%")
 top_losers = signals_df.nsmallest(10, "30D Return%")
 strong_trend = signals_df[signals_df["ADX"] > 25]
@@ -224,9 +208,6 @@ k4.metric("Avg Composite", round(signals_df["Composite Score"].mean(), 1))
 k5.metric("Total Stocks", len(signals_df))
 st.markdown("---")
 
-# ─────────────────────────────────────────────
-# TABS
-# ─────────────────────────────────────────────
 tab1, tab2, tab3, tab4 = st.tabs([
     "🧠 Advanced Scanner", "🚀 Market Pulse", "📊 Momentum & Trends", "📈 Expert Deep Dive"
 ])
@@ -339,19 +320,18 @@ with tab4:
         fig_rsi.update_layout(paper_bgcolor="#f8fafc", plot_bgcolor="#f8fafc", font=dict(color="#1e2937"), height=380, xaxis=dict(gridcolor="#e2e8f0"), yaxis=dict(gridcolor="#e2e8f0"))
         st.plotly_chart(fig_rsi, use_container_width=True)
         
-        # Chart 3: MACD + OBV (FIXED)
+        # Chart 3: MACD + OBV (FINAL FIX)
         st.markdown("#### 📉 MACD + OBV (Volume Confirmation)")
         fig_macd = make_subplots(rows=2, cols=1, shared_xaxes=True)
         histogram_filled = histogram.fillna(0)
-        hist_colors = ["#10b98180" if h >= 0 else "#ef444480" for h in histogram_filled]
-        fig_macd.add_trace(go.Bar(x=idx, y=list(histogram_filled), name="Histogram", marker_color=hist_colors), row=1, col=1)
+        fig_macd.add_trace(go.Bar(x=idx, y=list(histogram_filled), name="Histogram", marker_color="#10b981"), row=1, col=1)
         fig_macd.add_trace(go.Scatter(x=idx, y=macd_line, name="MACD", line=dict(color="#3b82f6", width=2)), row=1, col=1)
         fig_macd.add_trace(go.Scatter(x=idx, y=sig_line, name="Signal", line=dict(color="#ec4899", width=2)), row=1, col=1)
         fig_macd.add_trace(go.Scatter(x=idx, y=obv, name="OBV", line=dict(color="#8b5cf6", width=1.5)), row=2, col=1)
         fig_macd.update_layout(paper_bgcolor="#f8fafc", plot_bgcolor="#f8fafc", font=dict(color="#1e2937"), height=380, xaxis=dict(gridcolor="#e2e8f0"), yaxis=dict(gridcolor="#e2e8f0"))
         st.plotly_chart(fig_macd, use_container_width=True)
         
-        # Chart 4: Volume + ATR (FIXED)
+        # Chart 4: Volume + ATR
         st.markdown("#### 📦 Volume + ATR (Volatility)")
         vol_20ma = vol.rolling(20).mean()
         vol_colors = ["#10b98166" if float(c) >= float(o) else "#ef444466" for c, o in zip(close, open_)]
@@ -374,7 +354,6 @@ with tab4:
         
         st.markdown("**Expert Tip:** ADX > 25 + RSI < 40 + MACD Bullish = High probability reversal. Use ATR for stop-loss (2x ATR below entry).")
 
-# Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align:center; color:#475569; font-family: IBM Plex Mono, monospace; font-size:11px; padding: 8px 0;'>
