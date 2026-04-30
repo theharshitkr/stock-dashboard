@@ -10,7 +10,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # ─────────────────────────────────────────────
-# PAGE CONFIG + LIGHT THEME (Expert Look)
+# PAGE CONFIG + LIGHT THEME
 # ─────────────────────────────────────────────
 st.set_page_config(page_title="NSE Pro Analyzer • Expert Edition", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
@@ -36,7 +36,7 @@ div[data-testid="metric-container"] { background: #ffffff; border: 1px solid #e2
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-# 250+ MAJOR NSE STOCKS (Fast + Covers 80%+ Market)
+# 250+ MAJOR NSE STOCKS
 # ─────────────────────────────────────────────
 @st.cache_data(ttl=86400)
 def get_all_nse_stocks():
@@ -62,8 +62,8 @@ def get_all_nse_stocks():
         "TRENT": "TRENT.NS", "DMART": "DMART.NS", "GODREJCP": "GODREJCP.NS", "VARUNBEV": "VARUNBEV.NS",
         "BHARTIARTL": "BHARTIARTL.NS", "HINDALCO": "HINDALCO.NS", "TATAMTRDVR": "TATAMTRDVR.NS",
         "SBICARD": "SBICARD.NS", "ICICIPRULI": "ICICIPRULI.NS", "MUTHOOTFIN": "MUTHOOTFIN.NS",
-        "CHOLAFIN": "CHOLAFIN.NS", "BAJAJHLDNG": "BAJAJHLDNG.NS", "BAJAJFINSV": "BAJAJFINSV.NS",
-        "HDFCAMC": "HDFCAMC.NS", "NIFTYBEES": "NIFTYBEES.NS", "BANKBEES": "BANKBEES.NS"
+        "CHOLAFIN": "CHOLAFIN.NS", "BAJAJHLDNG": "BAJAJHLDNG.NS", "HDFCAMC": "HDFCAMC.NS",
+        "NIFTYBEES": "NIFTYBEES.NS", "BANKBEES": "BANKBEES.NS"
     }
     return stocks, list(stocks.keys())
 
@@ -71,8 +71,16 @@ STOCKS, NAME_LIST = get_all_nse_stocks()
 TICKER_LIST = list(STOCKS.values())[:250]
 
 # ─────────────────────────────────────────────
-# ADVANCED INDICATORS (Expert Level)
+# ADVANCED EXPERT FUNCTIONS
 # ─────────────────────────────────────────────
+@st.cache_data(ttl=3600)
+def fetch_bulk_data(period="1y"):
+    return yf.download(TICKER_LIST, period=period, interval="1d", group_by="ticker", auto_adjust=True, progress=False)
+
+@st.cache_data(ttl=3600)
+def fetch_single_stock(ticker, period="1y"):
+    return yf.download(ticker, period=period, auto_adjust=True, progress=False)
+
 def compute_rsi(series, period=14):
     delta = series.diff()
     gain = delta.clip(lower=0).rolling(period).mean()
@@ -105,8 +113,7 @@ def compute_stochastic(high, low, close, period=14, smooth=3):
     return k, d
 
 def compute_obv(close, volume):
-    obv = (np.sign(close.diff()) * volume).cumsum()
-    return obv
+    return (np.sign(close.diff()) * volume).cumsum()
 
 def compute_atr(high, low, close, period=14):
     tr = pd.concat([high - low, abs(high - close.shift()), abs(low - close.shift())], axis=1).max(axis=1)
@@ -117,7 +124,7 @@ def get_composite_score(rsi, macd_val, sig_val, adx, stoch_k, stoch_d, vol_ratio
     if rsi < 35: score += 18
     elif rsi > 70: score -= 18
     if macd_val > sig_val: score += 15
-    if adx > 25: score += 12   # Strong trend
+    if adx > 25: score += 12
     if stoch_k < 20 and stoch_d < 20: score += 12
     elif stoch_k > 80 and stoch_d > 80: score -= 12
     if vol_ratio > 1.5: score += 10
@@ -180,7 +187,7 @@ with st.sidebar:
     st.markdown("**Expert Edition** • ADX • Stochastic • OBV • ATR")
     st.markdown("---")
     selected_stock = st.selectbox("🔍 Select Stock", NAME_LIST, index=0)
-    any_ticker = st.text_input("🧪 Search ANY ticker (e.g. ZOMATO.NS, IRCTC.NS)", "")
+    any_ticker = st.text_input("🧪 Search ANY ticker (e.g. ZOMATO.NS)", "")
     selected_ticker = STOCKS.get(selected_stock, any_ticker.upper() if any_ticker else STOCKS[selected_stock])
     chart_period = st.selectbox("📅 Period", ["3mo", "6mo", "1y", "2y"], index=2)
     st.caption("⚠️ Educational • Not financial advice • Data: yFinance")
@@ -226,7 +233,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 with tab1:
     st.markdown("### 🧠 Advanced Signal Scanner (Expert Composite Score)")
-    st.markdown('<div class="tip-box">Score = RSI + MACD + ADX + Stochastic + Volume + 30D Return (Experts use this combination)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="tip-box">Score = RSI + MACD + ADX + Stochastic + Volume + 30D Return (Experts use this)</div>', unsafe_allow_html=True)
     
     fc1, fc2, fc3, fc4 = st.columns(4)
     with fc1:
@@ -298,7 +305,6 @@ with tab4:
                                          round((cur_price / float(close.iloc[-22]) - 1) * 100, 2) if len(close) >= 22 else 0)
         signal_label = "BUY" if comp_score >= 70 else "HOLD" if comp_score >= 45 else "SELL"
         
-        # Stats Row
         m1, m2, m3, m4, m5, m6 = st.columns(6)
         m1.metric("Price", f"₹{cur_price:,.2f}")
         m2.metric("RSI", f"{cur_rsi:.1f}")
@@ -309,8 +315,8 @@ with tab4:
         
         st.markdown("---")
         
-        # Chart 1: Price + Indicators
-        st.markdown("#### 🕯️ Price + Bollinger + MA + Pivot")
+        # Chart 1: Price
+        st.markdown("#### 🕯️ Price + Bollinger + MA")
         fig_price = go.Figure()
         fig_price.add_trace(go.Candlestick(x=idx, open=open_, high=high, low=low, close=close, increasing_line_color="#10b981", decreasing_line_color="#ef4444"))
         fig_price.add_trace(go.Scatter(x=idx, y=bb_upper, name="BB Upper", line=dict(color="#8b5cf6", width=1, dash="dot")))
@@ -355,7 +361,7 @@ with tab4:
         fig_vol.update_layout(paper_bgcolor="#f8fafc", plot_bgcolor="#f8fafc", font=dict(color="#1e2937"), height=260, xaxis=dict(gridcolor="#e2e8f0"), yaxis=dict(gridcolor="#e2e8f0", title="Volume"), yaxis2=dict(overlaying="y", side="right", title="ATR"))
         st.plotly_chart(fig_vol, use_container_width=True)
         
-        # Key Levels + Expert Notes
+        # Key Levels
         st.markdown("### 🎯 Key Levels + Expert Notes")
         w52h = float(close.rolling(min(252, len(close))).max().iloc[-1])
         w52l = float(close.rolling(min(252, len(close))).min().iloc[-1])
