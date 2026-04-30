@@ -339,34 +339,24 @@ with tab4:
         fig_rsi.update_layout(paper_bgcolor="#f8fafc", plot_bgcolor="#f8fafc", font=dict(color="#1e2937"), height=380, xaxis=dict(gridcolor="#e2e8f0"), yaxis=dict(gridcolor="#e2e8f0"))
         st.plotly_chart(fig_rsi, use_container_width=True)
         
-        # Chart 3: MACD (FIXED - Simple & Working)
+        # Chart 3: MACD + OBV (FIXED)
         st.markdown("#### 📉 MACD + OBV (Volume Confirmation)")
         fig_macd = make_subplots(rows=2, cols=1, shared_xaxes=True)
         histogram_filled = histogram.fillna(0)
-        fig_macd.add_trace(go.Bar(
-        x=idx, 
-        y=list(histogram_filled), 
-        name="Histogram", 
-        marker_color="#636EFA"   # Simple single color - works perfectly
-        ), row=1, col=1)
+        hist_colors = ["#10b98180" if h >= 0 else "#ef444480" for h in histogram_filled]
+        fig_macd.add_trace(go.Bar(x=idx, y=list(histogram_filled), name="Histogram", marker_color=hist_colors), row=1, col=1)
         fig_macd.add_trace(go.Scatter(x=idx, y=macd_line, name="MACD", line=dict(color="#3b82f6", width=2)), row=1, col=1)
         fig_macd.add_trace(go.Scatter(x=idx, y=sig_line, name="Signal", line=dict(color="#ec4899", width=2)), row=1, col=1)
         fig_macd.add_trace(go.Scatter(x=idx, y=obv, name="OBV", line=dict(color="#8b5cf6", width=1.5)), row=2, col=1)
-        fig_macd.update_layout(
-        paper_bgcolor="#f8fafc", 
-        plot_bgcolor="#f8fafc", 
-        font=dict(color="#1e2937"),
-        height=380, 
-        xaxis=dict(gridcolor="#e2e8f0"), 
-        yaxis=dict(gridcolor="#e2e8f0")
-        )
+        fig_macd.update_layout(paper_bgcolor="#f8fafc", plot_bgcolor="#f8fafc", font=dict(color="#1e2937"), height=380, xaxis=dict(gridcolor="#e2e8f0"), yaxis=dict(gridcolor="#e2e8f0"))
         st.plotly_chart(fig_macd, use_container_width=True)
-        # Chart 4: Volume + ATR
+        
+        # Chart 4: Volume + ATR (FIXED)
         st.markdown("#### 📦 Volume + ATR (Volatility)")
         vol_20ma = vol.rolling(20).mean()
         vol_colors = ["#10b98166" if float(c) >= float(o) else "#ef444466" for c, o in zip(close, open_)]
         fig_vol = go.Figure()
-        fig_vol.add_trace(go.Bar(x=idx, y=list(vol), name="Volume", marker=dict(color=vol_colors)))
+        fig_vol.add_trace(go.Bar(x=idx, y=list(vol), name="Volume", marker_color=vol_colors))
         fig_vol.add_trace(go.Scatter(x=idx, y=vol_20ma, name="20-day Avg", line=dict(color="#f59e0b", width=1.5, dash="dot")))
         fig_vol.add_trace(go.Scatter(x=idx, y=atr, name="ATR (14)", line=dict(color="#8b5cf6", width=1.5), yaxis="y2"))
         fig_vol.update_layout(paper_bgcolor="#f8fafc", plot_bgcolor="#f8fafc", font=dict(color="#1e2937"), height=260, xaxis=dict(gridcolor="#e2e8f0"), yaxis=dict(gridcolor="#e2e8f0", title="Volume"), yaxis2=dict(overlaying="y", side="right", title="ATR"))
