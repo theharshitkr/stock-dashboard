@@ -3,127 +3,48 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings("ignore")
 
 # ─────────────────────────────────────────────
-# PAGE CONFIG + CUSTOM CSS
+# PAGE CONFIG + LIGHT THEME CSS (Fixed & Premium)
 # ─────────────────────────────────────────────
 st.set_page_config(page_title="NSE Full Market Analyzer", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
-# ─────────────────────────────────────────────
-# CUSTOM CSS - LIGHT THEME (Premium Look)
-# ─────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
 html, body, [class*="css"] {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: #f8fafc;
     color: #1e2937;
 }
 .stApp { background-color: #f8fafc; }
+h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #0f172a; }
 
-h1, h2, h3 { 
-    font-family: 'Plus Jakarta Sans', sans-serif; 
-    font-weight: 800; 
-    color: #0f172a; 
-}
+/* Badges */
+.badge-buy { background: #ecfdf5; color: #10b981; padding: 5px 16px; border-radius: 9999px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #10b981; }
+.badge-sell { background: #fef2f2; color: #ef4444; padding: 5px 16px; border-radius: 9999px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #ef4444; }
+.badge-hold { background: #fffbeb; color: #d97706; padding: 5px 16px; border-radius: 9999px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #d97706; }
 
-/* Cards */
-.stat-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 18px 22px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
-}
+.tip-box { background: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 8px; padding: 12px 16px; color: #0369a1; }
+.label-sm { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: #64748b; text-transform: uppercase; }
 
-/* Signal badges */
-.badge-buy {
-    background: #ecfdf5;
-    color: #10b981;
-    padding: 5px 16px;
-    border-radius: 9999px;
-    font-size: 13px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 600;
-    border: 1px solid #10b981;
-}
-.badge-sell {
-    background: #fef2f2;
-    color: #ef4444;
-    padding: 5px 16px;
-    border-radius: 9999px;
-    font-size: 13px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 600;
-    border: 1px solid #ef4444;
-}
-.badge-hold {
-    background: #fffbeb;
-    color: #d97706;
-    padding: 5px 16px;
-    border-radius: 9999px;
-    font-size: 13px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 600;
-    border: 1px solid #d97706;
-}
-
-.label-sm {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    color: #64748b;
-    text-transform: uppercase;
-}
-
-.tip-box {
-    background: #f0f9ff;
-    border-left: 4px solid #0ea5e9;
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: #0369a1;
-}
-
-/* Streamlit overrides */
-div[data-testid="metric-container"] {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 14px 18px;
-    box-shadow: 0 2px 4px rgb(0 0 0 / 0.04);
-}
-
-[data-testid="stSidebar"] {
-    background-color: #f1f5f9 !important;
-    border-right: 1px solid #e2e8f0;
-}
-
-.stSelectbox > div > div, .stTextInput > div > div > input {
-    background: #ffffff !important;
-    border-color: #cbd5e1 !important;
-    color: #1e2937 !important;
-}
-
-.stTabs [data-baseweb="tab-list"] {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 6px;
-}
-
-.stDataFrame { background: #ffffff; }
+/* Streamlit fixes for light theme */
+div[data-testid="metric-container"] { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; }
+[data-testid="stSidebar"] { background-color: #f1f5f9 !important; border-right: 1px solid #e2e8f0; }
+.stSelectbox > div > div, .stTextInput > div > div > input { background: #ffffff !important; border-color: #cbd5e1 !important; color: #1e2937 !important; }
 </style>
 """, unsafe_allow_html=True)
+
 # ─────────────────────────────────────────────
-# FAST NSE STOCKS LIST (No external CSV download)
+# FAST NSE STOCKS (250+ popular)
 # ─────────────────────────────────────────────
 @st.cache_data(ttl=86400)
 def get_all_nse_stocks():
-    # Tera original 50 stocks + 100+ popular stocks (fast & reliable)
     stocks = {
         "RELIANCE": "RELIANCE.NS", "TCS": "TCS.NS", "INFY": "INFY.NS", "HDFCBANK": "HDFCBANK.NS",
         "ICICIBANK": "ICICIBANK.NS", "LT": "LT.NS", "SBIN": "SBIN.NS", "AXISBANK": "AXISBANK.NS",
@@ -140,8 +61,6 @@ def get_all_nse_stocks():
         "PIDILITIND": "PIDILITIND.NS", "DABUR": "DABUR.NS", "MARICO": "MARICO.NS",
         "ADANIPORTS": "ADANIPORTS.NS", "JSWSTEEL": "JSWSTEEL.NS", "HINDZINC": "HINDZINC.NS",
         "VEDL": "VEDL.NS", "SHREECEM": "SHREECEM.NS", "ADANIENT": "ADANIENT.NS",
-        
-        # Extra popular stocks (Zomato, IRCTC, etc.)
         "ZOMATO": "ZOMATO.NS", "IRCTC": "IRCTC.NS", "NYKAA": "NYKAA.NS", "PAYTM": "PAYTM.NS",
         "ADANIENSOL": "ADANIENSOL.NS", "ADANIGREEN": "ADANIGREEN.NS", "HAL": "HAL.NS",
         "BEL": "BEL.NS", "LICI": "LICI.NS", "SBILIFE": "SBILIFE.NS", "HDFCLIFE": "HDFCLIFE.NS",
@@ -151,15 +70,18 @@ def get_all_nse_stocks():
     return stocks, list(stocks.keys())
 
 STOCKS, NAME_LIST = get_all_nse_stocks()
-TICKER_LIST = list(STOCKS.values())[:250]   # fast loading ke liye
+TICKER_LIST = list(STOCKS.values())[:250]
 
 # ─────────────────────────────────────────────
-# HELPER FUNCTIONS
+# HELPER FUNCTIONS (Full Analysis)
 # ─────────────────────────────────────────────
 @st.cache_data(ttl=3600)
 def fetch_bulk_data(period="1y"):
-    data = yf.download(TICKER_LIST, period=period, interval="1d", group_by="ticker", auto_adjust=True, progress=False)
-    return data
+    return yf.download(TICKER_LIST, period=period, interval="1d", group_by="ticker", auto_adjust=True, progress=False)
+
+@st.cache_data(ttl=3600)
+def fetch_single_stock(ticker, period="1y"):
+    return yf.download(ticker, period=period, auto_adjust=True, progress=False)
 
 def compute_rsi(series, period=14):
     delta = series.diff()
@@ -196,7 +118,7 @@ def safe_get_close(bulk, ticker):
 @st.cache_data(ttl=3600)
 def build_signals_df(bulk):
     records = []
-    for name, ticker in list(STOCKS.items())[:300]:
+    for name, ticker in list(STOCKS.items())[:250]:
         try:
             close = safe_get_close(bulk, ticker)
             if len(close) < 60: continue
@@ -224,67 +146,57 @@ def build_signals_df(bulk):
     return pd.DataFrame(records)
 
 # ─────────────────────────────────────────────
-# SIDEBAR
+# SIDEBAR & HEADER
 # ─────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## 📈 NSE Full Market Analyzer")
     st.markdown("---")
-    selected_stock = st.selectbox("🔍 Select Stock (800+)", NAME_LIST, index=0)
-    any_ticker = st.text_input("🧪 Ya koi bhi stock search karo (ZOMATO.NS, IRCTC.NS etc.)", "")
+    selected_stock = st.selectbox("🔍 Select Stock", NAME_LIST, index=0)
+    any_ticker = st.text_input("🧪 Search any stock (e.g. ZOMATO.NS)", "")
     selected_ticker = STOCKS.get(selected_stock, any_ticker.upper() if any_ticker else STOCKS[selected_stock])
     chart_period = st.selectbox("📅 Chart Duration", ["3mo", "6mo", "1y", "2y"], index=2)
     st.caption("⚠️ Educational use only • Not financial advice")
 
-# ─────────────────────────────────────────────
-# HEADER
-# ─────────────────────────────────────────────
 st.markdown("""
 <div style='margin-bottom: 16px;'>
-  <div class='label-sm'>NSE INDIA • 800+ STOCKS</div>
-  <h1 style='font-size: 2.3rem; margin: 4px 0; color: #f1f5f9;'>📈 NSE Full Market Analyzer</h1>
-  <p style='color: #64748b; font-size: 14px;'>Live Signals • Top 30D Gainers • Composite Score (0-100)</p>
+  <div class='label-sm'>NSE INDIA • 250+ STOCKS</div>
+  <h1 style='font-size: 2.4rem; margin: 4px 0;'>📈 NSE Full Market Analyzer</h1>
+  <p style='color: #64748b; font-size: 14px;'>Live Signals • 30D Growth • RSI • MACD • Composite Score</p>
 </div>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
 # LOAD DATA
 # ─────────────────────────────────────────────
-with st.spinner("⏳ Loading 800+ stocks data... (first load ~25-35 sec)"):
+with st.spinner("⏳ Loading market data..."):
     bulk = fetch_bulk_data("1y")
     signals_df = build_signals_df(bulk)
 
 if signals_df.empty:
-    st.error("Data load failed. Page refresh karo.")
+    st.error("Data load failed. Refresh the page.")
     st.stop()
 
-# ─────────────────────────────────────────────
-# TOP KPIs + TOP 10 30D GAINERS
-# ─────────────────────────────────────────────
+# Top KPIs
 top_gainers = signals_df.nlargest(10, "30D Return%")
 top_losers = signals_df.nsmallest(10, "30D Return%")
-
 k1, k2, k3, k4, k5 = st.columns(5)
 k1.metric("🚀 Top 30D Gainer", top_gainers.iloc[0]["Stock"], f"+{top_gainers.iloc[0]['30D Return%']}%")
 k2.metric("📉 Top 30D Loser", top_losers.iloc[0]["Stock"], f"{top_losers.iloc[0]['30D Return%']}%")
 k3.metric("🟢 Strong Buy", len(signals_df[signals_df["Composite Score"] >= 70]))
-k4.metric("Avg Composite Score", round(signals_df["Composite Score"].mean(), 1))
+k4.metric("Avg Composite", round(signals_df["Composite Score"].mean(), 1))
 k5.metric("Total Stocks", len(signals_df))
-
 st.markdown("---")
 
 # ─────────────────────────────────────────────
 # TABS
 # ─────────────────────────────────────────────
 tab1, tab2, tab3, tab4 = st.tabs([
-    "🧠 Buy/Sell Signals", 
-    "🚀 Market Pulse (Top Gainers)", 
-    "📊 Momentum & Returns", 
-    "📈 Stock Deep Dive"
+    "🧠 Buy/Sell Signals", "🚀 Market Pulse", "📊 Momentum & Returns", "📈 Stock Deep Dive"
 ])
 
 with tab1:
     st.markdown("### 🧠 Advanced Signal Scanner")
-    st.dataframe(signals_df.sort_values("Composite Score", ascending=False), use_container_width=True)
+    st.dataframe(signals_df.sort_values("Composite Score", ascending=False), use_container_width=True, height=500)
 
 with tab2:
     st.markdown("### 🚀 Market Pulse - Last 30 Days")
@@ -293,16 +205,20 @@ with tab2:
 
 with tab3:
     st.markdown("### 📊 Momentum & Returns")
-    st.write("Momentum tab coming soon...")
+    st.write("Momentum tab coming in next update (will add streaks)")
 
 with tab4:
     st.markdown(f"### 📈 Deep Dive: {selected_stock}")
-    st.write("Deep dive chart coming in next update...")
+    stock_data = fetch_single_stock(selected_ticker, chart_period)
+    if not stock_data.empty:
+        close = stock_data["Close"].squeeze()
+        # (Full charts code can be added here - let me know if you want full deep dive charts now)
+        st.write("Deep Dive charts coming in next update (Candlestick + RSI + MACD)")
 
 # Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align:center; color:#475569; font-family: IBM Plex Mono, monospace; font-size:11px; padding: 8px 0;'>
-  NSE Full Market Analyzer • 800+ Stocks • Data: yFinance • Educational Only
+  NSE Full Market Analyzer • Data via yFinance • Educational use only
 </div>
 """, unsafe_allow_html=True)
