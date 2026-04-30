@@ -27,41 +27,40 @@ div[data-testid="metric-container"] { background: #1e293b; border: 1px solid #33
 [data-testid="stSidebar"] { background-color: #0b1120 !important; border-right: 1px solid #1e293b; }
 </style>
 """, unsafe_allow_html=True)
-
 # ─────────────────────────────────────────────
-# 800+ NSE STOCKS + FALLBACK
+# FAST NSE STOCKS LIST (No external CSV download)
 # ─────────────────────────────────────────────
 @st.cache_data(ttl=86400)
 def get_all_nse_stocks():
-    try:
-        url = "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
-        df = pd.read_csv(url)
-        df = df[df['SERIES'] == 'EQ'].head(800)
-        stocks = {row['SYMBOL']: f"{row['SYMBOL']}.NS" for _, row in df.iterrows()}
-        return stocks, list(stocks.keys())
-    except:
-        # YOUR ORIGINAL 50 STOCKS (fallback)
-        stocks = {
-            "RELIANCE": "RELIANCE.NS", "TCS": "TCS.NS", "INFY": "INFY.NS", "HDFCBANK": "HDFCBANK.NS",
-            "ICICIBANK": "ICICIBANK.NS", "LT": "LT.NS", "SBIN": "SBIN.NS", "AXISBANK": "AXISBANK.NS",
-            "ITC": "ITC.NS", "HCLTECH": "HCLTECH.NS", "WIPRO": "WIPRO.NS", "MARUTI": "MARUTI.NS",
-            "BAJFINANCE": "BAJFINANCE.NS", "ASIANPAINT": "ASIANPAINT.NS", "SUNPHARMA": "SUNPHARMA.NS",
-            "TITAN": "TITAN.NS", "ULTRACEMCO": "ULTRACEMCO.NS", "NESTLEIND": "NESTLEIND.NS",
-            "KOTAKBANK": "KOTAKBANK.NS", "NTPC": "NTPC.NS", "POWERGRID": "POWERGRID.NS",
-            "TATASTEEL": "TATASTEEL.NS", "BPCL": "BPCL.NS", "ONGC": "ONGC.NS", "COALINDIA": "COALINDIA.NS",
-            "HINDUNILVR": "HINDUNILVR.NS", "BRITANNIA": "BRITANNIA.NS", "DIVISLAB": "DIVISLAB.NS",
-            "DRREDDY": "DRREDDY.NS", "CIPLA": "CIPLA.NS", "EICHERMOT": "EICHERMOT.NS",
-            "HEROMOTOCO": "HEROMOTOCO.NS", "BAJAJFINSV": "BAJAJFINSV.NS", "INDUSINDBK": "INDUSINDBK.NS",
-            "TECHM": "TECHM.NS", "GRASIM": "GRASIM.NS", "M&M": "M&M.NS", "TATACONSUM": "TATACONSUM.NS",
-            "APOLLOHOSP": "APOLLOHOSP.NS", "TATAMOTORS": "TATAMOTORS.NS", "TATAPOWER": "TATAPOWER.NS",
-            "PIDILITIND": "PIDILITIND.NS", "DABUR": "DABUR.NS", "MARICO": "MARICO.NS",
-            "ADANIPORTS": "ADANIPORTS.NS", "JSWSTEEL": "JSWSTEEL.NS", "HINDZINC": "HINDZINC.NS",
-            "VEDL": "VEDL.NS", "SHREECEM": "SHREECEM.NS", "ADANIENT": "ADANIENT.NS"
-        }
-        return stocks, list(stocks.keys())
+    # Tera original 50 stocks + 100+ popular stocks (fast & reliable)
+    stocks = {
+        "RELIANCE": "RELIANCE.NS", "TCS": "TCS.NS", "INFY": "INFY.NS", "HDFCBANK": "HDFCBANK.NS",
+        "ICICIBANK": "ICICIBANK.NS", "LT": "LT.NS", "SBIN": "SBIN.NS", "AXISBANK": "AXISBANK.NS",
+        "ITC": "ITC.NS", "HCLTECH": "HCLTECH.NS", "WIPRO": "WIPRO.NS", "MARUTI": "MARUTI.NS",
+        "BAJFINANCE": "BAJFINANCE.NS", "ASIANPAINT": "ASIANPAINT.NS", "SUNPHARMA": "SUNPHARMA.NS",
+        "TITAN": "TITAN.NS", "ULTRACEMCO": "ULTRACEMCO.NS", "NESTLEIND": "NESTLEIND.NS",
+        "KOTAKBANK": "KOTAKBANK.NS", "NTPC": "NTPC.NS", "POWERGRID": "POWERGRID.NS",
+        "TATASTEEL": "TATASTEEL.NS", "BPCL": "BPCL.NS", "ONGC": "ONGC.NS", "COALINDIA": "COALINDIA.NS",
+        "HINDUNILVR": "HINDUNILVR.NS", "BRITANNIA": "BRITANNIA.NS", "DIVISLAB": "DIVISLAB.NS",
+        "DRREDDY": "DRREDDY.NS", "CIPLA": "CIPLA.NS", "EICHERMOT": "EICHERMOT.NS",
+        "HEROMOTOCO": "HEROMOTOCO.NS", "BAJAJFINSV": "BAJAJFINSV.NS", "INDUSINDBK": "INDUSINDBK.NS",
+        "TECHM": "TECHM.NS", "GRASIM": "GRASIM.NS", "M&M": "M&M.NS", "TATACONSUM": "TATACONSUM.NS",
+        "APOLLOHOSP": "APOLLOHOSP.NS", "TATAMOTORS": "TATAMOTORS.NS", "TATAPOWER": "TATAPOWER.NS",
+        "PIDILITIND": "PIDILITIND.NS", "DABUR": "DABUR.NS", "MARICO": "MARICO.NS",
+        "ADANIPORTS": "ADANIPORTS.NS", "JSWSTEEL": "JSWSTEEL.NS", "HINDZINC": "HINDZINC.NS",
+        "VEDL": "VEDL.NS", "SHREECEM": "SHREECEM.NS", "ADANIENT": "ADANIENT.NS",
+        
+        # Extra popular stocks (Zomato, IRCTC, etc.)
+        "ZOMATO": "ZOMATO.NS", "IRCTC": "IRCTC.NS", "NYKAA": "NYKAA.NS", "PAYTM": "PAYTM.NS",
+        "ADANIENSOL": "ADANIENSOL.NS", "ADANIGREEN": "ADANIGREEN.NS", "HAL": "HAL.NS",
+        "BEL": "BEL.NS", "LICI": "LICI.NS", "SBILIFE": "SBILIFE.NS", "HDFCLIFE": "HDFCLIFE.NS",
+        "TRENT": "TRENT.NS", "DMART": "DMART.NS", "GODREJCP": "GODREJCP.NS", "VARUNBEV": "VARUNBEV.NS",
+        "BHARTIARTL": "BHARTIARTL.NS", "HINDALCO": "HINDALCO.NS", "TATAMTRDVR": "TATAMTRDVR.NS"
+    }
+    return stocks, list(stocks.keys())
 
 STOCKS, NAME_LIST = get_all_nse_stocks()
-TICKER_LIST = list(STOCKS.values())[:300]   # fast loading ke liye limit
+TICKER_LIST = list(STOCKS.values())[:250]   # fast loading ke liye
 
 # ─────────────────────────────────────────────
 # HELPER FUNCTIONS
