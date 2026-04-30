@@ -3,14 +3,12 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings("ignore")
 
 # ─────────────────────────────────────────────
-# PAGE CONFIG + CUSTOM CSS (teri purani wali hi rakhi)
+# PAGE CONFIG + CUSTOM CSS
 # ─────────────────────────────────────────────
 st.set_page_config(page_title="NSE Full Market Analyzer", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
@@ -20,7 +18,6 @@ st.markdown("""
 html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #e2e8f0; }
 .stApp { background-color: #0f172a; }
 h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #f1f5f9; }
-.stat-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 16px 20px; margin-bottom: 10px; }
 .badge-buy { background: #052e16; color: #4ade80; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #166534; display: inline-block; }
 .badge-sell { background: #2d0a0a; color: #f87171; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #991b1b; display: inline-block; }
 .badge-hold { background: #1c1408; color: #fbbf24; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; border: 1px solid #92400e; display: inline-block; }
@@ -28,40 +25,51 @@ h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; col
 .tip-box { background: #0f2444; border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 13px; color: #93c5fd; margin: 8px 0 16px 0; }
 div[data-testid="metric-container"] { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px 16px; }
 [data-testid="stSidebar"] { background-color: #0b1120 !important; border-right: 1px solid #1e293b; }
-.stSelectbox > div > div, .stTextInput > div > div > input { background: #1e293b !important; border-color: #334155 !important; color: #e2e8f0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-# 800+ NSE STOCKS (sab listed companies)
+# 800+ NSE STOCKS + FALLBACK
 # ─────────────────────────────────────────────
 @st.cache_data(ttl=86400)
 def get_all_nse_stocks():
     try:
         url = "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
         df = pd.read_csv(url)
-        df = df[df['SERIES'] == 'EQ'].head(800)  # speed ke liye limit
+        df = df[df['SERIES'] == 'EQ'].head(800)
         stocks = {row['SYMBOL']: f"{row['SYMBOL']}.NS" for _, row in df.iterrows()}
         return stocks, list(stocks.keys())
     except:
-        # fallback to your original 50
-        stocks = {"RELIANCE": "RELIANCE.NS", "TCS": "TCS.NS", ...}  # tera purana STOCKS yahan daal sakta hai
+        # YOUR ORIGINAL 50 STOCKS (fallback)
+        stocks = {
+            "RELIANCE": "RELIANCE.NS", "TCS": "TCS.NS", "INFY": "INFY.NS", "HDFCBANK": "HDFCBANK.NS",
+            "ICICIBANK": "ICICIBANK.NS", "LT": "LT.NS", "SBIN": "SBIN.NS", "AXISBANK": "AXISBANK.NS",
+            "ITC": "ITC.NS", "HCLTECH": "HCLTECH.NS", "WIPRO": "WIPRO.NS", "MARUTI": "MARUTI.NS",
+            "BAJFINANCE": "BAJFINANCE.NS", "ASIANPAINT": "ASIANPAINT.NS", "SUNPHARMA": "SUNPHARMA.NS",
+            "TITAN": "TITAN.NS", "ULTRACEMCO": "ULTRACEMCO.NS", "NESTLEIND": "NESTLEIND.NS",
+            "KOTAKBANK": "KOTAKBANK.NS", "NTPC": "NTPC.NS", "POWERGRID": "POWERGRID.NS",
+            "TATASTEEL": "TATASTEEL.NS", "BPCL": "BPCL.NS", "ONGC": "ONGC.NS", "COALINDIA": "COALINDIA.NS",
+            "HINDUNILVR": "HINDUNILVR.NS", "BRITANNIA": "BRITANNIA.NS", "DIVISLAB": "DIVISLAB.NS",
+            "DRREDDY": "DRREDDY.NS", "CIPLA": "CIPLA.NS", "EICHERMOT": "EICHERMOT.NS",
+            "HEROMOTOCO": "HEROMOTOCO.NS", "BAJAJFINSV": "BAJAJFINSV.NS", "INDUSINDBK": "INDUSINDBK.NS",
+            "TECHM": "TECHM.NS", "GRASIM": "GRASIM.NS", "M&M": "M&M.NS", "TATACONSUM": "TATACONSUM.NS",
+            "APOLLOHOSP": "APOLLOHOSP.NS", "TATAMOTORS": "TATAMOTORS.NS", "TATAPOWER": "TATAPOWER.NS",
+            "PIDILITIND": "PIDILITIND.NS", "DABUR": "DABUR.NS", "MARICO": "MARICO.NS",
+            "ADANIPORTS": "ADANIPORTS.NS", "JSWSTEEL": "JSWSTEEL.NS", "HINDZINC": "HINDZINC.NS",
+            "VEDL": "VEDL.NS", "SHREECEM": "SHREECEM.NS", "ADANIENT": "ADANIENT.NS"
+        }
         return stocks, list(stocks.keys())
 
 STOCKS, NAME_LIST = get_all_nse_stocks()
-TICKER_LIST = list(STOCKS.values())[:300]  # bulk ke liye 300 tak limit (fast loading)
+TICKER_LIST = list(STOCKS.values())[:300]   # fast loading ke liye limit
 
 # ─────────────────────────────────────────────
-# HELPER FUNCTIONS (enhanced with Composite Score)
+# HELPER FUNCTIONS
 # ─────────────────────────────────────────────
 @st.cache_data(ttl=3600)
 def fetch_bulk_data(period="1y"):
     data = yf.download(TICKER_LIST, period=period, interval="1d", group_by="ticker", auto_adjust=True, progress=False)
     return data
-
-@st.cache_data(ttl=3600)
-def fetch_single_stock(ticker, period="1y"):
-    return yf.download(ticker, period=period, auto_adjust=True, progress=False)
 
 def compute_rsi(series, period=14):
     delta = series.diff()
@@ -88,11 +96,6 @@ def get_composite_score(rsi, macd_val, sig_val, price, ma50, ma200, vol_ratio, r
     if ret_30d and ret_30d < -10: score -= 15
     return max(0, min(100, score))
 
-def get_signal(score):
-    if score >= 70: return "BUY", "badge-buy"
-    elif score >= 45: return "HOLD", "badge-hold"
-    else: return "SELL", "badge-sell"
-
 def safe_get_close(bulk, ticker):
     try:
         close = bulk[ticker]["Close"].dropna()
@@ -100,7 +103,6 @@ def safe_get_close(bulk, ticker):
     except:
         return pd.Series(dtype=float)
 
-# Build enhanced signals
 @st.cache_data(ttl=3600)
 def build_signals_df(bulk):
     records = []
@@ -108,7 +110,7 @@ def build_signals_df(bulk):
         try:
             close = safe_get_close(bulk, ticker)
             if len(close) < 60: continue
-            vol = bulk[ticker]["Volume"].dropna().squeeze() if ticker in bulk else pd.Series(dtype=float)
+            vol = bulk[ticker]["Volume"].dropna().squeeze() if ticker in bulk.columns.levels[0] else pd.Series(dtype=float)
             
             rsi = float(compute_rsi(close).iloc[-1])
             ma50 = float(close.rolling(50).mean().iloc[-1])
@@ -119,13 +121,13 @@ def build_signals_df(bulk):
             ret_30d = round((float(close.iloc[-1]) / float(close.iloc[-22]) - 1) * 100, 2) if len(close) >= 22 else 0
             
             comp_score = get_composite_score(rsi, float(macd.iloc[-1]), float(sig_line.iloc[-1]),
-                                           float(close.iloc[-1]), ma50, ma200, vol_ratio, ret_30d)
-            signal, badge = get_signal(comp_score)
+                                             float(close.iloc[-1]), ma50, ma200, vol_ratio, ret_30d)
+            signal = "BUY" if comp_score >= 70 else "HOLD" if comp_score >= 45 else "SELL"
             
             records.append({
                 "Stock": name, "Ticker": ticker, "Price (₹)": round(float(close.iloc[-1]), 2),
-                "30D Return%": ret_30d, "RSI": round(rsi, 1), "Composite Score": comp_score,
-                "Signal": signal, "Badge": badge, "Vol Ratio": vol_ratio
+                "30D Return%": ret_30d, "RSI": round(rsi, 1), "Composite Score": round(comp_score, 1),
+                "Signal": signal, "Vol Ratio": vol_ratio
             })
         except:
             continue
@@ -138,7 +140,7 @@ with st.sidebar:
     st.markdown("## 📈 NSE Full Market Analyzer")
     st.markdown("---")
     selected_stock = st.selectbox("🔍 Select Stock (800+)", NAME_LIST, index=0)
-    any_ticker = st.text_input("🧪 Search ANY stock (e.g. ZOMATO.NS, IRCTC.NS)", "")
+    any_ticker = st.text_input("🧪 Ya koi bhi stock search karo (ZOMATO.NS, IRCTC.NS etc.)", "")
     selected_ticker = STOCKS.get(selected_stock, any_ticker.upper() if any_ticker else STOCKS[selected_stock])
     chart_period = st.selectbox("📅 Chart Duration", ["3mo", "6mo", "1y", "2y"], index=2)
     st.caption("⚠️ Educational use only • Not financial advice")
@@ -150,7 +152,7 @@ st.markdown("""
 <div style='margin-bottom: 16px;'>
   <div class='label-sm'>NSE INDIA • 800+ STOCKS</div>
   <h1 style='font-size: 2.3rem; margin: 4px 0; color: #f1f5f9;'>📈 NSE Full Market Analyzer</h1>
-  <p style='color: #64748b; font-size: 14px;'>Live Signals • Top Gainers • 30D Growth • Composite Score</p>
+  <p style='color: #64748b; font-size: 14px;'>Live Signals • Top 30D Gainers • Composite Score (0-100)</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -162,7 +164,7 @@ with st.spinner("⏳ Loading 800+ stocks data... (first load ~25-35 sec)"):
     signals_df = build_signals_df(bulk)
 
 if signals_df.empty:
-    st.error("Data load failed. Refresh karo.")
+    st.error("Data load failed. Page refresh karo.")
     st.stop()
 
 # ─────────────────────────────────────────────
@@ -174,8 +176,8 @@ top_losers = signals_df.nsmallest(10, "30D Return%")
 k1, k2, k3, k4, k5 = st.columns(5)
 k1.metric("🚀 Top 30D Gainer", top_gainers.iloc[0]["Stock"], f"+{top_gainers.iloc[0]['30D Return%']}%")
 k2.metric("📉 Top 30D Loser", top_losers.iloc[0]["Stock"], f"{top_losers.iloc[0]['30D Return%']}%")
-k3.metric("🟢 Strong Signals", len(signals_df[signals_df["Composite Score"] >= 70]))
-k4.metric("Avg Composite", round(signals_df["Composite Score"].mean(), 1))
+k3.metric("🟢 Strong Buy", len(signals_df[signals_df["Composite Score"] >= 70]))
+k4.metric("Avg Composite Score", round(signals_df["Composite Score"].mean(), 1))
 k5.metric("Total Stocks", len(signals_df))
 
 st.markdown("---")
@@ -183,27 +185,29 @@ st.markdown("---")
 # ─────────────────────────────────────────────
 # TABS
 # ─────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "🧠 Buy/Sell Signals", 
     "🚀 Market Pulse (Top Gainers)", 
     "📊 Momentum & Returns", 
-    "📈 Stock Deep Dive", 
-    "🏭 Sector Overview"
+    "📈 Stock Deep Dive"
 ])
 
-# TAB 1: Signals
 with tab1:
-    st.markdown("### 🧠 Advanced Signal Scanner (Composite Score 0-100)")
-    st.markdown('<div class="tip-box">Higher Composite Score = Stronger Buy Signal</div>', unsafe_allow_html=True)
-    # filters and dataframe same as your original but with Composite Score added
-    # (main ne yahan bhi enhance kiya hai)
+    st.markdown("### 🧠 Advanced Signal Scanner")
+    st.dataframe(signals_df.sort_values("Composite Score", ascending=False), use_container_width=True)
 
-# TAB 2: NEW MARKET PULSE
 with tab2:
     st.markdown("### 🚀 Market Pulse - Last 30 Days")
-    st.dataframe(top_gainers[["Stock", "Price (₹)", "30D Return%", "Composite Score", "Signal"]].style.background_gradient(subset=["30D Return%"], cmap="RdYlGn"), use_container_width=True)
+    st.markdown("**Top 10 Growing Stocks**")
+    st.dataframe(top_gainers[["Stock", "Price (₹)", "30D Return%", "Composite Score", "Signal"]], use_container_width=True)
 
-# Baaki tabs bhi enhance kiye gaye hain (deep dive mein composite score + ADX)
+with tab3:
+    st.markdown("### 📊 Momentum & Returns")
+    st.write("Momentum tab coming soon...")
+
+with tab4:
+    st.markdown(f"### 📈 Deep Dive: {selected_stock}")
+    st.write("Deep dive chart coming in next update...")
 
 # Footer
 st.markdown("---")
